@@ -7,14 +7,14 @@ Projeto do SDK de Documentoscopia.
 
 ## Requisitos
 * Versão do sistema operacional iOS: 15.0 ou superior.
-* Versão do projeto Swift 4.2+: funciona com Xcode superior ao 13.
+* Versão do projeto Swift 4.2+: funciona com Xcode superior ao 14.2.
 * 18.5mb de espaço em disco.
 
 ## Pacotes internos contidos no CSDocumentoscopySDK
 
 ````
-'Amplitude',
-'Sentry', 
+'Amplitude', 
+'Sentry',
 'TensorFlowLiteSwift', '2.13.0'
 'TensorFlowLiteTaskVision', '0.4.3'
 ````
@@ -61,7 +61,7 @@ Adicionar as seguintes entradas ao arquivo Info.plist do projeto de destino:
 
 ## Classe CSDocumentoscopySDK
 ### Descrição
-CSDocumentoscopySDK é a classe responsável pela inicialização do SDK.
+CSDocumentoscopy é a classe responsável pela inicialização do SDK.
 
 | Atributo/Função | Descrição |
 | :------------: |:---------------|
@@ -81,34 +81,34 @@ CSDocumentoscopySDK é a classe responsável pela inicialização do SDK.
 
 | Evento | Descrição |
 | :------------: |:---------------|
-| didFinishCapture(result: CSDocumentoscopySDKResult) | Ao finalizar todo o fluxo e enviar com sucesso as imagens para o servidor o SDK se fecha sozinho após 2 segundos disparando este evento. |
+| didFinishCapture(result: CSDocumentoscopyResult) | Ao finalizar todo o fluxo e enviar com sucesso as imagens para o servidor o SDK se fecha sozinho após 2 segundos disparando este evento. |
 
-Nele teremos um objeto do tipo CSDocumentoscopySDKResult, chamado de result que contem os atributos: 
+Nele teremos um objeto do tipo CSDocumentoscopyResult, chamado de result que contem os atributos: 
 
-### Classe CSDocumentoscopySDKResult:
+### Classe CSDocumentoscopyResult:
 
 | Parâmetro  | Tipo  | Descrição |
 | :------------: |:---------------:| :-----|
 | sessionId | String | Session ID do usuário. | 
-| images | [String] | Retorno das imagens em Base64. | 
+| documentType | CSDocumentoscopyDocumentType | Tipo de documento capturado | 
 
 ### Evento de Error:
 
 | Evento | Descrição |
 | :------------: |:---------------|
-| didReceiveError(error: CSDocumentoscopySDKError) | Ao acontecer erros mapeados este evento será chamado, logo após o SDK ser fechado automaticamente. |
+| didReceiveError(error: CSDocumentoscopyError) | Ao acontecer erros mapeados este evento será chamado, logo após o SDK ser fechado automaticamente. |
 
-Nele teremos um enum do tipo CSDocumentoscopySDKError, chamado de error que contem: 
+Nele teremos um enum do tipo CSDocumentoscopyError, chamado de error que contem: 
 
-### Classe CSDocumentoscopySDKError:
+### Classe CSDocumentoscopyError:
 
 | Parâmetro  | Tipo  | Descrição |
 | :------------: |:---------------:| :-----|
-| case | CSDocumentoscopySDKError | Enum interno de error. | 
+| case | CSDocumentoscopyError | Enum interno de error. | 
 | text | String | Texto descritivo do error. | 
 | errorCode | Int | Código interno do error. | 
 
-### Enum CSDocumentoscopySDKError:
+### Enum CSDocumentoscopyError:
 
 | Nome do case  | Error code  | Descrição |
 | :------------: |:---------------:| :-----|
@@ -118,6 +118,8 @@ Nele teremos um enum do tipo CSDocumentoscopySDKError, chamado de error que cont
 | authenticationFailure | 04 | There was an error authenticating the user. |
 | invalidCPF | 05 | An error occurred while validating the CPF format. |
 | invalidIdentifierId | 06 | An error occurred while validating the IdentifierId format, make sure it has a maximum of 100 characters. |
+| internalError | 07 | An internal error occurred. |
+| switchContext | 08 | The client application went into the background. |
 
 ## Exemplo de integração
 * Faça a importação da biblioteca em sua classe.
@@ -128,23 +130,24 @@ import CSDocumentoscopySDK
 * Instancie o SDK passando os parâmetros pedidos, conforme exemplo abaixo. 
 
 ````
-let sdk = CSDocumentoscopySDK()
+let sdk = CSDocumentoscopy()
 sdk.delegate = self
 sdk.initialize(
   clientId: "PARÂMETRO ENVIADO PELA CLEAR SALE",
   clientSecret: "PARÂMETRO ENVIADO PELA CLEAR SALE",
   identifierId: "PARÂMETRO GERADO PELO CLIENTE",
   cpf: "CPF DO USUÁRIO",
-  navigationController: "NAVIGATION CONTROLLER DO PROJETO")
+  viewController: "CONTEXTO AONDE O SDK SERÁ ABERTO")
 ````
 
-* Extenda o protocolo CSDocumentoscopySDKDelegate e implemente seus métodos, para receber os retornos do SDK, como no exemplo abaixo. 
+* Extenda o protocolo CSDocumentoscopyDelegate e implemente seus métodos, para receber os retornos do SDK, como no exemplo abaixo. 
 
 ````
-extension Classe: CSDocumentoscopySDKDelegate {
+extension Classe: CSDocumentoscopyDelegate {
     func didOpen() { }
     func didTapClose() { }
-    func didFinishCapture(result: CSDocumentoscopySDKResult) { }
-    func didReceiveError(error: CSDocumentoscopySDKError) { }
+    func didFinishCapture(result: CSDocumentoscopyResult) { }
+    func didReceiveError(error: CSDocumentoscopyError) { }
 }
 ````
+
